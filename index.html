@@ -1,0 +1,633 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>王の食庫</title>
+<meta name="theme-color" content="#5fc251">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="王の食庫">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-face-180.png">
+<link rel="icon" href="icon-face-192.png">
+<style>
+/* Layout: green "calling card" hero with the character art, slanted black menu slabs for tabs, tilted paper cards on an ink background. Single deliberate theme (ink / green / paper). */
+:root{
+  --ink:#0e0f0d; --ink2:#1b1d19; --paper:#fbfbf3; --paper2:#ecede2;
+  --green:#5fc251; --green-deep:#23893a; --green-glow:#a6ee7c; --yellow:#f3dd48;
+  --muted:#6b6f64; --line:#0e0f0d;
+  --font-hero:"Futura","Avenir Next Condensed","Arial Black","Helvetica Neue",Impact,sans-serif;
+  --font-body:-apple-system,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;background:var(--ink)}
+body{margin:0;min-height:100vh;color:var(--paper);font-family:var(--font-body);font-size:15px;line-height:1.5;padding-bottom:env(safe-area-inset-bottom,0px);-webkit-tap-highlight-color:transparent;
+  background:
+    radial-gradient(circle at 1px 1px,rgba(95,194,81,.16) 1.2px,transparent 1.6px) 0 0/9px 9px,
+    repeating-linear-gradient(-58deg,transparent 0 46px,rgba(255,255,255,.025) 46px 92px),
+    var(--ink)}
+button,input,select,textarea{font:inherit;color:inherit}
+input,select,textarea{font-size:16px}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+
+/* ---------- hero ---------- */
+.hero{position:relative;overflow:hidden;min-height:300px;padding-top:env(safe-area-inset-top,0px);
+  background:
+    repeating-radial-gradient(circle at 118% 120%,transparent 0 52px,rgba(255,255,255,.22) 52px 60px,transparent 60px 112px),
+    linear-gradient(160deg,var(--green) 0%,#4fb246 100%);
+  clip-path:polygon(0 0,100% 0,100% 88%,62% 100%,0 93%)}
+.hero-art{position:absolute;right:-10%;bottom:0;top:env(safe-area-inset-top,0px);width:min(72%,470px);
+  clip-path:polygon(18% 0,100% 0,100% 100%,0 100%);filter:drop-shadow(-6px 0 0 var(--ink))}
+.hero-art img{width:100%;height:100%;object-fit:cover;object-position:56% 6%;display:block;max-width:none}
+.hero-inner{position:relative;max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 46px;min-height:300px;display:flex;flex-direction:column;justify-content:space-between;gap:14px}
+.hero-actions{display:flex;gap:8px;justify-content:flex-end;position:relative;z-index:2}
+h1.ransom{margin:0;display:flex;align-items:flex-end;gap:2px;font-weight:900;line-height:1;transform:rotate(-6deg);transform-origin:left bottom}
+.ransom span{display:inline-block;padding:4px 8px 6px;border:3px solid var(--ink)}
+.ransom span:nth-child(1){font-size:58px;background:var(--ink);color:var(--paper);transform:rotate(-4deg);box-shadow:5px 5px 0 var(--paper)}
+.ransom span:nth-child(2){font-size:30px;background:var(--paper);color:var(--ink);transform:rotate(8deg) translateY(-14px);font-family:"Hiragino Mincho ProN","Yu Mincho",serif}
+.ransom span:nth-child(3){font-size:48px;background:var(--yellow);color:var(--ink);transform:rotate(-2deg)}
+.ransom span:nth-child(4){font-size:54px;background:var(--ink);color:var(--green-glow);transform:rotate(5deg) translateY(4px);-webkit-text-stroke:1px var(--ink)}
+.hero-sub{margin:14px 0 0;display:inline-block;background:var(--ink);color:var(--paper);font-family:var(--font-hero);font-weight:900;font-style:italic;letter-spacing:.14em;font-size:12px;padding:4px 14px 4px 10px;transform:skewX(-14deg) rotate(-6deg);transform-origin:left;clip-path:polygon(0 0,100% 0,94% 100%,0 100%)}
+.hero-count{font-family:var(--font-hero);font-weight:900;font-style:italic;color:var(--ink);font-size:15px;letter-spacing:.04em;transform:rotate(-6deg);transform-origin:left;display:flex;align-items:baseline;gap:6px}
+.hero-count b{font-size:40px;color:var(--paper);-webkit-text-stroke:2px var(--ink);paint-order:stroke fill;text-shadow:4px 4px 0 var(--ink)}
+
+/* ---------- buttons ---------- */
+.btn{border:2px solid var(--ink);background:var(--paper);color:var(--ink);padding:6px 14px;white-space:nowrap;text-decoration:none;display:inline-block;font-weight:800;transform:skewX(-12deg);transition:transform .12s;letter-spacing:.02em}
+.btn > *{display:inline-block}
+.btn:active{transform:skewX(-12deg) scale(.94)}
+.btn.primary{background:var(--ink);color:var(--green-glow);border-color:var(--ink);box-shadow:4px 4px 0 var(--paper)}
+.btn.small{padding:3px 10px;font-size:13px}
+.btn.danger{background:var(--ink);color:#ff6b6b;border-color:var(--ink)}
+.btn:disabled{opacity:.5}
+.hero .btn{box-shadow:4px 4px 0 var(--ink)}
+.hero .btn.primary{box-shadow:4px 4px 0 var(--paper)}
+
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 70px;display:grid;grid-template-columns:minmax(0,1fr);gap:16px;margin-top:-26px;position:relative}
+#panelSlot:empty{display:none}
+
+/* ---------- location bar: a black slab with a jagged edge ---------- */
+.here{position:sticky;top:calc(env(safe-area-inset-top,0px) + 6px);z-index:5;background:var(--ink);border:3px solid var(--paper);padding:12px 12px 10px;transform:rotate(-1deg);box-shadow:6px 6px 0 var(--green)}
+.here-row{display:flex;gap:8px;transform:rotate(1deg)}
+.here-row input{flex:1;min-width:0;border:2px solid var(--paper);background:var(--paper);color:var(--ink);padding:7px 12px;font-weight:600}
+.here-row input::placeholder{color:var(--muted);font-weight:400}
+.here .btn.primary{background:var(--green);color:var(--ink);box-shadow:3px 3px 0 var(--paper)}
+.here .btn:not(.primary){background:var(--ink);color:var(--paper);border-color:var(--paper)}
+.here-status{font-size:13px;color:#b9bdb0;margin-top:8px;min-height:1.4em;transform:rotate(1deg)}
+.here-status b{color:var(--green-glow)}
+.quick{display:flex;gap:8px;overflow-x:auto;padding:8px 4px 4px;scrollbar-width:none;transform:rotate(1deg)}
+.quick::-webkit-scrollbar{display:none}
+.quick .chip{background:var(--ink2);color:var(--paper);border-color:#3a3d35}
+
+/* ---------- chips ---------- */
+.chip{border:2px solid var(--paper);background:transparent;color:var(--paper);padding:2px 11px;font-size:13px;white-space:nowrap;font-weight:700;transform:skewX(-12deg)}
+.chip[aria-pressed="true"]{background:var(--green);color:var(--ink);border-color:var(--green);box-shadow:3px 3px 0 var(--paper)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;padding-left:4px}
+
+/* ---------- menu tabs: slanted slabs ---------- */
+.tabs{display:flex;gap:10px;padding:4px 0 0 2px}
+.tab{position:relative;border:0;background:var(--paper);color:var(--ink);padding:8px 22px 8px 16px;display:flex;flex-direction:column;align-items:flex-start;line-height:1.05;transform:skewX(-14deg) rotate(-2deg);clip-path:polygon(0 6%,100% 0,94% 100%,3% 92%)}
+.tab b{font-family:var(--font-hero);font-weight:900;font-style:italic;font-size:22px;letter-spacing:.02em}
+.tab small{font-size:11px;font-weight:700;letter-spacing:.1em}
+.tab[aria-selected="true"]{background:var(--green);color:var(--ink);transform:skewX(-14deg) rotate(-4deg) scale(1.06);box-shadow:none;filter:drop-shadow(4px 4px 0 var(--paper))}
+.tab[aria-selected="false"]{opacity:.75}
+
+.filters{display:grid;gap:10px}
+label.tog{display:flex;gap:6px;align-items:center;font-size:13px;color:#c9ccc1;font-weight:600;padding-left:4px}
+label.tog input{accent-color:var(--green);width:16px;height:16px}
+
+.districts{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px}
+.dist{border:2px solid var(--paper);background:var(--ink2);color:var(--paper);padding:8px 10px;text-align:left;display:flex;justify-content:space-between;align-items:baseline;gap:4px;font-weight:800;transform:skewX(-10deg)}
+.dist span{font-family:var(--font-hero);font-style:italic;font-weight:900;color:var(--green-glow);font-size:14px}
+.dist[aria-pressed="true"]{background:var(--green);color:var(--ink);border-color:var(--green);box-shadow:3px 3px 0 var(--paper)}
+.dist[aria-pressed="true"] span{color:var(--ink)}
+.dist.empty{opacity:.4}
+
+/* ---------- result cards: tilted paper notes ---------- */
+.hint{font-size:13px;color:#c9ccc1;margin:0 0 10px 4px;font-weight:600}
+.hint::before{content:"▶ ";color:var(--green)}
+.list{display:grid;gap:16px}
+.card{position:relative;background:var(--paper);color:var(--ink);border:3px solid var(--ink);outline:2px solid var(--paper);padding:14px 16px 14px;display:grid;grid-template-columns:1fr auto;gap:5px 12px;box-shadow:7px 7px 0 var(--green);transform:rotate(-.8deg)}
+.card:nth-child(even){transform:rotate(.7deg);box-shadow:-7px 7px 0 var(--green)}
+.card::after{content:"";position:absolute;right:-3px;top:-3px;width:34px;height:34px;background:var(--ink);clip-path:polygon(0 0,100% 0,100% 100%)}
+.card .name{font-weight:900;font-size:18px;min-width:0;letter-spacing:.01em}
+.dist-km{font-family:var(--font-hero);font-weight:900;font-style:italic;font-size:26px;line-height:1;text-align:right;white-space:nowrap;color:var(--green);-webkit-text-stroke:1.5px var(--ink);paint-order:stroke fill;text-shadow:3px 3px 0 var(--ink);padding-right:18px}
+.dist-km small{display:block;font-family:var(--font-body);font-style:normal;font-weight:700;font-size:11px;color:var(--muted);-webkit-text-stroke:0;text-shadow:none;margin-top:4px}
+.meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;color:var(--muted);grid-column:1/-1;font-weight:600}
+.tag{font-size:12px;padding:1px 9px;background:var(--ink);color:var(--paper);font-weight:800;transform:skewX(-12deg);display:inline-block}
+.tag.want{background:var(--yellow);color:var(--ink)}
+.tag.been{background:transparent;color:var(--muted);border:1.5px solid var(--muted)}
+.addr,.note{grid-column:1/-1;font-size:13px;color:var(--muted);min-width:0;overflow-wrap:anywhere}
+.note{color:var(--ink);font-weight:600;border-left:4px solid var(--green);padding-left:8px}
+.actions{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.actions .btn{box-shadow:2px 2px 0 var(--ink)}
+.confirm{grid-column:1/-1;display:flex;gap:8px;align-items:center;font-size:13px;font-weight:700;color:var(--ink)}
+.empty-state{background:var(--paper);color:var(--muted);border:3px solid var(--ink);outline:2px solid var(--paper);padding:26px 20px;text-align:center;box-shadow:7px 7px 0 var(--green);transform:rotate(-.6deg)}
+.empty-state h2{color:var(--ink);margin-bottom:8px}
+
+/* ---------- panels ---------- */
+h2{font-size:20px;margin:0;font-weight:900;letter-spacing:.04em}
+.panel{background:var(--paper);color:var(--ink);border:3px solid var(--ink);outline:2px solid var(--paper);padding:0 16px 16px;display:grid;gap:12px;box-shadow:8px 8px 0 var(--green);clip-path:polygon(0 0,100% 0,100% calc(100% - 22px),calc(100% - 22px) 100%,0 100%)}
+.panel > h2:first-child{margin:0 -16px;background:var(--ink);color:var(--paper);padding:10px 16px;font-family:var(--font-body)}
+.panel > h2:first-child::before{content:"";display:inline-block;width:10px;height:18px;background:var(--green);transform:skewX(-14deg);margin-right:10px;vertical-align:-3px}
+.panel h2{color:var(--ink)}
+.panel > h2:first-child{color:var(--paper)}
+.panel hr{border:0;border-top:3px solid var(--ink);width:100%;margin:2px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field{display:grid;gap:4px;min-width:0}
+.field.full{grid-column:1/-1}
+.field label{font-size:12px;color:var(--ink);font-weight:800;letter-spacing:.06em}
+.field input,.field select,.field textarea,.row input{border:2px solid var(--ink);background:#fff;color:var(--ink);padding:8px 10px;width:100%;border-radius:0}
+.field textarea{resize:vertical;min-height:90px}
+.panel label.tog{color:var(--ink)}
+.search-box{display:grid;gap:8px;padding:12px;background:var(--green);border:2px solid var(--ink)}
+.search-box p{margin:0;font-size:13px;color:var(--ink);font-weight:700}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row input{flex:1;min-width:0}
+.poi-list{display:grid;background:#fff;border:2px solid var(--ink)}
+.poi{border:0;border-top:2px solid var(--paper2);background:none;text-align:left;padding:9px 12px;display:grid;gap:2px;color:var(--ink)}
+.poi:first-child{border-top:0}
+.poi:active{background:var(--yellow)}
+.poi b{font-weight:800}
+.poi span{font-size:12px;color:var(--muted)}
+.foot{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;align-items:center}
+.foot .msg{flex:1;font-size:13px;color:var(--muted);min-width:0;font-weight:600}
+.small-note{font-size:12px;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) rotate(-2deg);background:var(--ink);color:var(--green-glow);border:3px solid var(--paper);box-shadow:5px 5px 0 var(--green);padding:8px 18px;font-size:14px;font-weight:800;z-index:20;max-width:90vw}
+/* ---------- chat with her (红色对话区) ---------- */
+:root{--red:#b40000}
+.chat{position:relative;background:
+    radial-gradient(circle at 12% 18%,#fff 0 2px,transparent 3px),radial-gradient(circle at 88% 72%,#fff 0 2.5px,transparent 3.5px),radial-gradient(circle at 70% 12%,#fff 0 1.5px,transparent 2.5px),
+    var(--red);
+  border:3px solid var(--paper);outline:3px solid var(--ink);padding:14px 12px 16px;transform:rotate(-1deg);box-shadow:8px 8px 0 var(--ink);display:grid;gap:10px}
+.chat-title{position:absolute;top:-16px;left:14px;background:var(--paper);color:var(--ink);font-family:var(--font-hero);font-style:italic;font-weight:900;font-size:13px;letter-spacing:.12em;padding:2px 12px 2px 8px;transform:skewX(-14deg) rotate(-3deg);border:2px solid var(--ink)}
+#chatLog{display:grid;gap:12px;padding-top:6px}
+.msg{display:flex;align-items:center;min-width:0}
+.msg.her .pf{width:128px;height:auto;flex:none;position:relative;z-index:1;margin-right:-6px;filter:drop-shadow(3px 4px 0 rgba(0,0,0,.45));max-width:none}
+.pf.wait{visibility:hidden}
+.tail{flex:none;width:22px;height:30px;margin-right:-3px;position:relative;z-index:2}
+.bub{--shape:polygon(2% 4%,100% 0,97% 100%,0 94%);position:relative;background:var(--paper);padding:3px;clip-path:var(--shape);min-width:0;flex:0 1 auto}
+.bub > span{display:block;background:#000;color:#fff;padding:11px 16px 12px 14px;clip-path:var(--shape);font-weight:700;font-size:14px;line-height:1.5}
+.bub b{color:var(--green-glow)}
+.bub .em{color:var(--yellow)}
+.q{position:absolute;top:-14px;right:-6px;font-family:var(--font-hero);font-weight:900;font-size:26px;color:var(--paper);-webkit-text-stroke:2px #000;paint-order:stroke fill;transform:rotate(12deg);z-index:3}
+.msg.me{justify-content:flex-end;padding-left:56px}
+.msg.me .bub,.reply{--shape:polygon(0 6%,90% 0,90% 28%,100% 42%,93% 50%,97% 66%,91% 64%,89% 100%,7% 94%)}
+.msg.me .bub{background:#000}
+.msg.me .bub > span{background:var(--paper);color:var(--ink);padding:9px 30px 10px 18px}
+.replies{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.reply{border:0;background:#000;padding:3px;clip-path:var(--shape);text-decoration:none;transition:transform .12s}
+.reply > span{display:block;background:var(--paper);color:var(--ink);font-weight:900;font-size:14px;padding:7px 30px 8px 16px;clip-path:var(--shape)}
+.reply:active{transform:scale(.94)}
+.reply.go > span{background:var(--green)}
+/* toast as her bubble */
+.toast{display:flex;align-items:center;gap:0;background:none;border:0;box-shadow:none;padding:0;max-width:min(92vw,420px);color:#fff}
+.toast .pf{width:70px;flex:none;margin-right:-4px;position:relative;z-index:1;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.5));max-width:none}
+.toast .bub > span{font-size:13px;padding:8px 14px}
+@media (max-width:520px){.grid2{grid-template-columns:1fr}.ransom span:nth-child(1){font-size:50px}.ransom span:nth-child(3){font-size:42px}.ransom span:nth-child(4){font-size:46px}}
+@media (prefers-reduced-motion:reduce){.btn{transition:none}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-art" aria-hidden="true"><img src="hero.jpg" alt=""></div>
+  <div class="hero-inner">
+    <div class="hero-actions">
+      <button class="btn" id="setBtn" type="button" aria-label="设置">设置</button>
+      <button class="btn primary" id="addBtn" type="button">＋ 收藏</button>
+    </div>
+    <div>
+      <h1 class="ransom" aria-label="王の食庫"><span>王</span><span>の</span><span>食</span><span>庫</span></h1>
+      <p class="hero-sub" id="heroSub">SHANGHAI FOOD ARCHIVE</p>
+      <div class="hero-count">★ <b id="heroCount">0</b> SPOTS 收藏中</div>
+    </div>
+  </div>
+</header>
+<div class="wrap">
+
+  <div id="panelSlot"></div>
+
+  <section class="here" aria-label="我现在在哪">
+    <form class="here-row" id="hereForm">
+      <button class="btn primary" type="button" id="gpsBtn">定位我</button>
+      <input id="hereInput" list="landmarkList" placeholder="或输入地址、地标" autocomplete="off" enterkeyhint="search">
+      <button class="btn" type="submit" id="hereBtn">找</button>
+    </form>
+    <datalist id="landmarkList"></datalist>
+    <div class="here-status" id="hereStatus">点「定位我」或输入地点，按距离排出你收藏的餐厅。</div>
+    <div class="quick" id="quick"></div>
+  </section>
+
+  <section class="chat" aria-label="今天吃什么">
+    <div class="chat-title">TODAY'S PICK 今天吃什么</div>
+    <div id="chatLog" aria-live="polite"></div>
+    <div class="replies" id="chatReplies"></div>
+  </section>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tabNear" aria-selected="true" type="button"><b>NEARBY</b><small>附近</small></button>
+    <button class="tab" role="tab" id="tabDist" aria-selected="false" type="button"><b>AREA</b><small>按区逛</small></button>
+  </nav>
+  <div id="districtGrid" class="districts" hidden></div>
+  <div class="filters">
+    <div class="chips" id="cuisineChips"></div>
+    <label class="tog"><input type="checkbox" id="onlyWant"> 只看还没去过的</label>
+  </div>
+  <div id="results"></div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const ls={get(k){try{return JSON.parse(localStorage.getItem(k))}catch{return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch{return false}}};
+const SH_DISTRICTS=["黄浦","徐汇","长宁","静安","普陀","虹口","杨浦","浦东","闵行","宝山","嘉定","松江","青浦","奉贤","金山","崇明"];
+const CUISINES=["本帮菜","江浙菜","川菜","湘菜","粤菜","云贵菜","西北菜","东北菜","火锅","烧烤","面馆小吃","日料","韩餐","东南亚","西餐","咖啡甜品","酒吧","其他"];
+const SOURCES=["小红书","大众点评","抖音","公众号","朋友推荐","其他"];
+// GCJ-02 (高德坐标) approximations of common spots, used for quick picks and when no 高德 Key is set.
+const LANDMARKS=[
+ ["人民广场",31.2312,121.4781,"黄浦"],["南京东路",31.2362,121.4886,"黄浦"],["外滩",31.2381,121.4944,"黄浦"],["豫园",31.2253,121.4964,"黄浦"],
+ ["新天地",31.2181,121.4784,"黄浦"],["田子坊",31.2066,121.4734,"黄浦"],["老西门",31.2161,121.4904,"黄浦"],
+ ["静安寺",31.2216,121.4500,"静安"],["南京西路",31.2277,121.4634,"静安"],["上海火车站",31.2477,121.4603,"静安"],["大宁",31.2791,121.4624,"静安"],
+ ["陕西南路",31.2136,121.4634,"徐汇"],["武康路",31.2061,121.4464,"徐汇"],["衡山路",31.2031,121.4514,"徐汇"],["徐家汇",31.1931,121.4414,"徐汇"],["徐汇滨江",31.1761,121.4574,"徐汇"],
+ ["中山公园",31.2181,121.4214,"长宁"],["古北",31.1971,121.4044,"长宁"],["虹桥机场",31.1931,121.3374,"长宁"],
+ ["长寿路",31.2401,121.4444,"普陀"],["曹家渡",31.2281,121.4344,"静安"],
+ ["四川北路",31.2541,121.4884,"虹口"],["北外滩",31.2481,121.5044,"虹口"],["虹口足球场",31.2691,121.4844,"虹口"],
+ ["五角场",31.2971,121.5184,"杨浦"],
+ ["陆家嘴",31.2361,121.5044,"浦东"],["世纪大道",31.2267,121.5277,"浦东"],["世纪公园",31.2141,121.5554,"浦东"],["前滩",31.1481,121.4744,"浦东"],
+ ["张江",31.2031,121.5944,"浦东"],["金桥",31.2561,121.6004,"浦东"],["迪士尼",31.1421,121.6614,"浦东"],["浦东机场",31.1421,121.8094,"浦东"],
+ ["虹桥火车站",31.1921,121.3244,"闵行"],["七宝",31.1531,121.3554,"闵行"],["莘庄",31.1091,121.3894,"闵行"],
+ ["宝山",31.4031,121.4934,"宝山"],["嘉定新城",31.3401,121.2554,"嘉定"],["松江大学城",31.0461,121.2194,"松江"],["朱家角",31.1091,121.0604,"青浦"]
+];
+const STORE_KEY="hsd-items", KEY_KEY="hsd-amap-key", HERE_KEY="hsd-here", CITY_KEY="hsd-city";
+const SHANGHAI={name:"上海",adcode:"310000",center:{lat:31.2304,lng:121.4737},radius:90,districts:SH_DISTRICTS.map(name=>({name}))};
+// 大众点评城市编号和英文名（只收录常见城市；其他城市显示中文名、不显示点评按钮）
+const CITY_INFO={"上海":[1,"SHANGHAI"],"北京":[2,"BEIJING"],"杭州":[3,"HANGZHOU"],"广州":[4,"GUANGZHOU"],"南京":[5,"NANJING"],"苏州":[6,"SUZHOU"],"深圳":[7,"SHENZHEN"],"成都":[8,"CHENGDU"],"重庆":[9,"CHONGQING"],"天津":[10,"TIANJIN"],"宁波":[11,"NINGBO"],"无锡":[13,"WUXI"],"厦门":[15,"XIAMEN"],"武汉":[16,"WUHAN"],"西安":[17,"XI'AN"],"长沙":[344,"CHANGSHA"],"青岛":[21,"QINGDAO"]};
+let CITY=ls.get(CITY_KEY)||SHANGHAI;
+const isSH=()=>CITY.adcode==="310000";
+const DISTRICTS_LIST=()=>CITY.districts.map(d=>d.name);
+const shortName=s=>{s=String(s||"");const t=s.replace(/(新区|区|县|市)$/,"");return t.length>=2?t:s};
+const cityOf=r=>r.city||"上海";
+// 快捷地点：上海用内置地标，其他城市用各区中心
+const PLACES=()=>isSH()?LANDMARKS:CITY.districts.filter(d=>d.lat).map(d=>[d.name,d.lat,d.lng,d.name]);
+const placeMap=()=>new Map(PLACES().map(l=>[l[0],{lat:l[1],lng:l[2],district:l[3]}]));
+
+const TAIL='<svg class="tail" viewBox="0 0 22 30" aria-hidden="true"><path d="M22 4 L8 9 L14 13 L1 20 L12 19 L6 27 L22 22 Z" fill="#000" stroke="#fbfbf3" stroke-width="2.5" stroke-linejoin="miter"/></svg>';
+const pfImg=cls=>`<img class="pf ${PORTRAIT?"":"wait"} ${cls||""}" src="${PORTRAIT||"chara.jpg"}" alt="">`;
+function toast(msg){const t=document.createElement("div");t.className="toast";t.setAttribute("role","status");
+  t.innerHTML=pfImg()+TAIL+`<div class="bub"><span></span></div>`;t.querySelector(".bub span").textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2600)}
+/* 立绘：运行时把红色背景抠成透明 */
+let PORTRAIT=null;
+async function makePortrait(){
+  try{const img=new Image();img.src="chara.jpg";await img.decode();
+    const c=document.createElement("canvas");c.width=img.naturalWidth;c.height=img.naturalHeight;const x=c.getContext("2d");x.drawImage(img,0,0);
+    const d=x.getImageData(0,0,c.width,c.height),p=d.data;
+    for(let i=0;i<p.length;i+=4){const r=p[i],red=r-Math.max(p[i+1],p[i+2]);
+      if(r>95&&red>85)p[i+3]=0;else if(r>70&&red>45)p[i+3]=Math.round(255*(85-red)/40);}
+    x.putImageData(d,0,0);
+    PORTRAIT=await new Promise(res=>c.toBlob(b=>res(b?URL.createObjectURL(b):null),"image/png"));
+  }catch{PORTRAIT=null}
+  document.querySelectorAll("img.pf").forEach(i=>{if(PORTRAIT)i.src=PORTRAIT;i.classList.remove("wait")});
+}
+
+const state={view:"near",district:null,cuisine:null,onlyWant:false,here:ls.get(HERE_KEY),confirmDel:null,editing:null};
+let items=ls.get(STORE_KEY)||[];
+function persist(){if(!ls.set(STORE_KEY,items))toast("保存失败：手机存储空间不足或处于无痕模式");render()}
+if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+
+/* ---------- 高德 Web服务 API (JSONP) ---------- */
+const amapKey=()=>(ls.get(KEY_KEY)||"").trim();
+const AMAP_ERR={INVALID_USER_KEY:"高德 Key 不正确，请到「设置」里检查。",USERKEY_PLAT_NOMATCH:"Key 类型不对：创建 Key 时服务平台要选「Web服务」。",DAILY_QUERY_OVER_LIMIT:"今天的高德查询次数用完了，明天再试。",INVALID_USER_DOMAIN:"Key 绑定了域名白名单，请在高德控制台里去掉或加上你的网址。"};
+function amap(path,params){
+  return new Promise((resolve,reject)=>{
+    const key=amapKey();if(!key)return reject({code:"nokey",message:"还没有设置高德 Key"});
+    const cb="_amap"+Date.now()+Math.floor(Math.random()*1e6);
+    const s=document.createElement("script");
+    const done=()=>{clearTimeout(timer);delete window[cb];s.remove()};
+    const timer=setTimeout(()=>{done();reject({code:"timeout",message:"网络超时，请检查网络"})},10000);
+    window[cb]=d=>{done();if(d&&d.status==="1")resolve(d);else reject({code:d&&d.infocode,message:AMAP_ERR[d&&d.info]||("高德返回错误："+(d&&d.info||"未知"))})};
+    s.onerror=()=>{done();reject({code:"network",message:"连不上高德，请检查网络"})};
+    s.src="https://restapi.amap.com"+path+"?"+new URLSearchParams({...params,key,output:"JSON",callback:cb});
+    document.head.appendChild(s);
+  });
+}
+const parseLoc=s=>{const [lng,lat]=String(s||"").split(",").map(Number);return inSH(lat,lng)?{lat,lng}:null};
+const cleanDistrict=s=>{s=shortName(s);return DISTRICTS_LIST().includes(s)?s:""};
+const str=v=>Array.isArray(v)?"":String(v||"");
+function cuisineFromType(t){
+  t=String(t||"");const m=[["本帮","本帮菜"],["上海菜","本帮菜"],["浙江","江浙菜"],["江苏","江浙菜"],["淮扬","江浙菜"],["四川","川菜"],["川菜","川菜"],["湖南","湘菜"],["广东","粤菜"],["粤","粤菜"],["茶餐厅","粤菜"],["云南","云贵菜"],["贵州","云贵菜"],["西北","西北菜"],["新疆","西北菜"],["东北","东北菜"],["火锅","火锅"],["烧烤","烧烤"],["日本","日料"],["韩国","韩餐"],["东南亚","东南亚"],["泰国","东南亚"],["越南","东南亚"],["西餐","西餐"],["意式","西餐"],["法式","西餐"],["咖啡","咖啡甜品"],["甜品","咖啡甜品"],["蛋糕","咖啡甜品"],["酒吧","酒吧"],["快餐","面馆小吃"],["小吃","面馆小吃"],["面","面馆小吃"]];
+  for(const [k,v] of m)if(t.includes(k))return v;return "";
+}
+async function searchPlaces(keywords,restaurantsOnly){
+  const d=await amap("/v3/place/text",{keywords,city:CITY.adcode,citylimit:"true",offset:"10",page:"1",extensions:"base",...(restaurantsOnly?{types:"050000"}:{})});
+  return (d.pois||[]).map(p=>({name:str(p.name),address:str(p.address),district:cleanDistrict(p.adname),cuisine:cuisineFromType(p.type),tel:str(p.tel),...parseLoc(p.location)})).filter(p=>p.lat);
+}
+async function geocodeAddress(address){
+  const d=await amap("/v3/geocode/geo",{address,city:CITY.adcode});
+  const g=(d.geocodes||[])[0];if(!g)return null;const loc=parseLoc(g.location);if(!loc)return null;
+  return{...loc,district:cleanDistrict(g.district)};
+}
+async function locateText(text){
+  const lm=placeMap();if(lm.has(text))return{...lm.get(text),label:text};
+  const pois=await searchPlaces(text,false).catch(e=>{if(e.code==="nokey")throw e;return[]});
+  if(pois.length)return{lat:pois[0].lat,lng:pois[0].lng,label:pois[0].name};
+  const g=await geocodeAddress(text);return g?{...g,label:text}:null;
+}
+
+async function loadCity(name){
+  const d=await amap("/v3/config/district",{keywords:name,subdistrict:"2",extensions:"base"});
+  const top=(d.districts||[])[0];if(!top)return null;
+  let kids=top.districts||[];
+  if(top.level==="province"){
+    if(kids.length&&kids.every(k=>/城区|郊县/.test(k.name)))kids=kids.flatMap(k=>k.districts||[]); // 直辖市
+    else throw{code:"province",message:"「"+top.name+"」是省份，请输入具体城市，比如 杭州、成都。"};
+  }
+  const c=parseLL(top.center);if(!c)return null;
+  const districts=kids.map(k=>({name:shortName(k.name),...(parseLL(k.center)||{})}));
+  const radius=Math.min(400,Math.max(40,...districts.filter(x=>x.lat).map(x=>km(c,x)))+40);
+  return{name:shortName(top.name),adcode:top.adcode,center:c,radius,districts};
+}
+const parseLL=s=>{const [lng,lat]=String(s||"").split(",").map(Number);return validLL(lat,lng)?{lat,lng}:null};
+
+/* ---------- coordinates ---------- */
+const validLL=(lat,lng)=>typeof lat==="number"&&typeof lng==="number"&&lat>3&&lat<54&&lng>73&&lng<136;
+const inSH=(lat,lng)=>validLL(lat,lng)&&km(CITY.center,{lat,lng})<=CITY.radius; // "in current city"
+function wgsToGcj(lat,lng){ // GPS (WGS-84) -> 高德 (GCJ-02)
+  const a=6378245.0,ee=0.00669342162296594323,PI=Math.PI;
+  const tLat=(x,y)=>{let r=-100+2*x+3*y+0.2*y*y+0.1*x*y+0.2*Math.sqrt(Math.abs(x));r+=(20*Math.sin(6*x*PI)+20*Math.sin(2*x*PI))*2/3;r+=(20*Math.sin(y*PI)+40*Math.sin(y/3*PI))*2/3;r+=(160*Math.sin(y/12*PI)+320*Math.sin(y*PI/30))*2/3;return r};
+  const tLng=(x,y)=>{let r=300+x+2*y+0.1*x*x+0.1*x*y+0.1*Math.sqrt(Math.abs(x));r+=(20*Math.sin(6*x*PI)+20*Math.sin(2*x*PI))*2/3;r+=(20*Math.sin(x*PI)+40*Math.sin(x/3*PI))*2/3;r+=(150*Math.sin(x/12*PI)+300*Math.sin(x/30*PI))*2/3;return r};
+  let dLat=tLat(lng-105,lat-35),dLng=tLng(lng-105,lat-35);const rad=lat/180*PI;let m=Math.sin(rad);m=1-ee*m*m;const sq=Math.sqrt(m);
+  dLat=(dLat*180)/((a*(1-ee))/(m*sq)*PI);dLng=(dLng*180)/(a/sq*Math.cos(rad)*PI);return{lat:lat+dLat,lng:lng+dLng};
+}
+function km(a,b){const R=6371,t=x=>x*Math.PI/180;const dLa=t(b.lat-a.lat),dLo=t(b.lng-a.lng);const h=Math.sin(dLa/2)**2+Math.cos(t(a.lat))*Math.cos(t(b.lat))*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+function distLabel(d){
+  if(d<1)return[`${Math.round(d*100)*10} m`,`步行约 ${Math.max(1,Math.round(d*1.3/4.5*60))} 分钟`];
+  if(d<3)return[`${d.toFixed(1)} km`,`步行约 ${Math.round(d*1.3/4.5*60)} 分钟`];
+  return[`${d.toFixed(1)} km`,`打车约 ${Math.round(d*1.3/25*60+5)} 分钟`];
+}
+
+/* ---------- render ---------- */
+const cityItems=()=>items.filter(r=>cityOf(r)===CITY.name);
+const filtered=()=>cityItems().filter(r=>(!state.cuisine||r.cuisine===state.cuisine)&&(!state.onlyWant||!r.visited));
+function render(){
+  $("heroCount").textContent=cityItems().length;
+  const ci=CITY_INFO[CITY.name];$("heroSub").textContent=(ci?ci[1]:CITY.name)+" FOOD ARCHIVE";
+  $("tabNear").setAttribute("aria-selected",state.view==="near");
+  $("tabDist").setAttribute("aria-selected",state.view==="district");
+  $("districtGrid").hidden=state.view!=="district";
+  const counts={};cityItems().forEach(r=>{if(r.cuisine)counts[r.cuisine]=(counts[r.cuisine]||0)+1});
+  if(state.cuisine&&!counts[state.cuisine])state.cuisine=null;
+  const cs=Object.keys(counts).sort((a,b)=>counts[b]-counts[a]);
+  $("cuisineChips").innerHTML=cs.length?[`<button class="chip" type="button" data-c="" aria-pressed="${!state.cuisine}">全部菜系</button>`].concat(cs.map(c=>`<button class="chip" type="button" data-c="${esc(c)}" aria-pressed="${state.cuisine===c}">${esc(c)} ${counts[c]}</button>`)).join(""):"";
+  if(state.view==="district"){
+    const dc={};filtered().forEach(r=>{dc[r.district]=(dc[r.district]||0)+1});
+    $("districtGrid").innerHTML=DISTRICTS_LIST().map(d=>`<button class="dist${dc[d]?"":" empty"}" type="button" data-d="${d}" aria-pressed="${state.district===d}">${d}<span>${dc[d]||0}</span></button>`).join("");
+  }
+  const box=$("results");
+  if(!cityItems().length){box.innerHTML=`<div class="empty-state"><h2>${esc(CITY.name)}还没有收藏的餐厅</h2>看到不错的推荐时，点右上角「＋ 收藏」，输入店名，从高德的搜索结果里点一下就收好了。</div>`;return}
+  let list=filtered(),head="";
+  if(state.view==="near"){
+    if(!state.here){box.innerHTML=`<div class="empty-state"><h2>你现在在哪？</h2>点「定位我」或输入地点，就能按距离看到收藏的餐厅。也可以切到「按区逛」。</div>`;return}
+    const noLoc=list.filter(r=>!inSH(r.lat,r.lng)).length;
+    list=list.filter(r=>inSH(r.lat,r.lng)).map(r=>({...r,_d:km(state.here,r)})).sort((a,b)=>a._d-b._d);
+    head=`<p class="hint">离「${esc(state.here.label)}」由近到远${noLoc?`；有 ${noLoc} 家缺少位置，编辑后补上地址即可`:""}</p>`;
+  }else{
+    if(state.district)list=list.filter(r=>r.district===state.district);
+    list.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    if(state.here)list=list.map(r=>inSH(r.lat,r.lng)?{...r,_d:km(state.here,r)}:r);
+    head=`<p class="hint">${state.district?esc(state.district):"全部区"} · ${list.length} 家</p>`;
+  }
+  box.innerHTML=head+(list.length?`<div class="list">${list.map(card).join("")}</div>`:`<div class="empty-state">这里还没有符合条件的收藏。</div>`);
+}
+function navURL(r){return inSH(r.lat,r.lng)?`https://uri.amap.com/marker?position=${r.lng},${r.lat}&name=${encodeURIComponent(r.name)}&src=hsd&coordinate=gaode&callnative=1`
+    :`https://uri.amap.com/search?keyword=${encodeURIComponent(r.name)}&city=${CITY.adcode}&src=hsd&callnative=1`}
+function card(r){
+  const d=r._d!=null?distLabel(r._d):null;
+  const nav=navURL(r);
+  const dp=CITY_INFO[CITY.name];
+  return `<article class="card" data-id="${esc(r.id)}">
+    <div class="name">${esc(r.name)}</div>
+    <div class="dist-km">${d?`${d[0]}<small>${d[1]}</small>`:""}</div>
+    <div class="meta">${r.cuisine?`<span class="tag">${esc(r.cuisine)}</span>`:""}${r.district?`<span>${esc(r.district)}</span>`:""}
+      ${r.visited?`<span class="tag been">去过了</span>`:`<span class="tag want">想去</span>`}${r.source?`<span>· 来自${esc(r.source)}</span>`:""}</div>
+    ${r.note?`<div class="note">${esc(r.note)}</div>`:""}
+    ${r.address?`<div class="addr">${esc(r.address)}</div>`:""}
+    ${state.confirmDel===r.id?`<div class="confirm">确定删除「${esc(r.name)}」？<button class="btn small danger" data-act="del-yes" type="button">删除</button><button class="btn small" data-act="del-no" type="button">取消</button></div>`:
+    `<div class="actions"><a class="btn small" href="${nav}" target="_blank" rel="noopener">导航</a>
+      ${dp?`<a class="btn small" href="https://www.dianping.com/search/keyword/${dp[0]}/0_${encodeURIComponent(r.name)}" target="_blank" rel="noopener">点评</a>`:""}
+      <button class="btn small" data-act="visit" type="button">${r.visited?"标想去":"标去过"}</button>
+      <button class="btn small" data-act="edit" type="button">编辑</button>
+      <button class="btn small" data-act="del" type="button">删除</button></div>`}
+  </article>`;
+}
+
+/* ---------- add / edit ---------- */
+function openEditor(r){
+  state.editing=r?{...r}:{};
+  const e=state.editing,hasKey=!!amapKey();
+  $("panelSlot").innerHTML=`<form class="panel" id="ed">
+    <h2>${r?"编辑餐厅":"收藏一家餐厅"}</h2>
+    ${r?"":hasKey?`<div class="search-box"><p>输入店名（可以加上路名或商场），从高德结果里点一下自动填好。</p>
+      <div class="row"><input id="poiQ" placeholder="${isSH()?"例：老吉士 天平路":"输入店名，可加路名或商场"}" enterkeyhint="search"><button class="btn small primary" type="button" id="poiBtn">搜索</button></div>
+      <div id="poiRes"></div></div>`:`<div class="search-box"><p>在「设置」里填上高德 Key 后，输入店名就能自动填好地址和位置。现在可以先手动填写。</p></div>`}
+    <div class="grid2">
+      <div class="field full"><label for="edName">店名</label><input id="edName" required value="${esc(e.name)}"></div>
+      <div class="field"><label for="edCuisine">菜系</label><input id="edCuisine" list="cuisineList" value="${esc(e.cuisine)}" placeholder="选择或输入"></div>
+      <div class="field"><label for="edDistrict">所在区</label><select id="edDistrict"><option value="">请选择</option>${DISTRICTS_LIST().map(d=>`<option${d===e.district?" selected":""}>${d}</option>`).join("")}</select></div>
+      <div class="field full"><label for="edAddr">地址</label><input id="edAddr" value="${esc(e.address)}" placeholder="门牌地址"></div>
+      <div class="field"><label for="edSource">在哪看到的</label><select id="edSource"><option value="">—</option>${SOURCES.map(s=>`<option${s===e.source?" selected":""}>${s}</option>`).join("")}</select></div>
+      <div class="field"><label for="edNear">附近地点（没有 Key 时用来定位）</label><select id="edNear"><option value="">—</option>${PLACES().map(l=>`<option>${l[0]}</option>`).join("")}</select></div>
+      <div class="field full"><label for="edNote">备注 / 招牌菜</label><input id="edNote" value="${esc(e.note)}"></div>
+      <label class="tog field full"><input type="checkbox" id="edVisited" ${e.visited?"checked":""}> 已经去过了</label>
+    </div>
+    <div class="foot"><span class="msg" id="edMsg">${inSH(e.lat,e.lng)?"已有位置":""}</span>
+      <button class="btn" type="button" id="edCancel">取消</button><button class="btn primary" type="submit" id="edSave">保存</button></div>
+  </form><datalist id="cuisineList">${CUISINES.map(c=>`<option value="${c}">`).join("")}</datalist>`;
+  $("edCancel").onclick=closePanel;
+  $("edAddr").addEventListener("input",()=>{delete state.editing.lat;delete state.editing.lng;$("edMsg").textContent=""});
+  $("ed").onsubmit=saveEditor;
+  if(!r&&hasKey){
+    const go=async()=>{const q=$("poiQ").value.trim();if(!q)return;const out=$("poiRes");out.innerHTML=`<p class="small-note">搜索中…</p>`;
+      try{const ps=await searchPlaces(q,true);state.pois=ps;
+        out.innerHTML=ps.length?`<div class="poi-list">${ps.map((p,i)=>`<button class="poi" type="button" data-i="${i}"><b>${esc(p.name)}</b><span>${esc(p.district?p.district+"区 · ":"")}${esc(p.address)}</span></button>`).join("")}</div>`:`<p class="small-note">没搜到，换个关键词，或者直接在下面手动填写。</p>`;
+      }catch(err){out.innerHTML=`<p class="small-note">${esc(err.message)}</p>`}};
+    $("poiBtn").onclick=go;
+    $("poiQ").addEventListener("keydown",ev=>{if(ev.key==="Enter"){ev.preventDefault();go()}});
+    $("poiRes").onclick=ev=>{const b=ev.target.closest("[data-i]");if(!b)return;const p=state.pois[+b.dataset.i];
+      $("edName").value=p.name;$("edAddr").value=p.address;if(p.district)$("edDistrict").value=p.district;if(p.cuisine)$("edCuisine").value=p.cuisine;
+      state.editing.lat=p.lat;state.editing.lng=p.lng;$("edMsg").textContent="已获取位置，补充一下再保存";$("poiRes").innerHTML="";};
+    $("poiQ").focus();
+  }else $("edName").focus();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function closePanel(){state.editing=null;$("panelSlot").innerHTML=""}
+async function saveEditor(ev){
+  ev.preventDefault();
+  const e=state.editing,msg=$("edMsg"),btn=$("edSave");
+  const o={name:$("edName").value.trim(),cuisine:$("edCuisine").value.trim()||"其他",district:$("edDistrict").value,address:$("edAddr").value.trim(),
+    source:$("edSource").value,note:$("edNote").value.trim(),visited:$("edVisited").checked};
+  if(!o.name){msg.textContent="请填写店名。";return}
+  btn.disabled=true;let lat=e.lat,lng=e.lng;
+  if(!inSH(lat,lng)&&o.address&&amapKey()){msg.textContent="正在根据地址定位…";try{const g=await geocodeAddress(o.address);if(g){lat=g.lat;lng=g.lng;if(!o.district)o.district=g.district}}catch{}}
+  const near=$("edNear").value;
+  if(!inSH(lat,lng)&&near){const l=placeMap().get(near);lat=l.lat;lng=l.lng;if(!o.district)o.district=l.district}
+  o.lat=inSH(lat,lng)?lat:null;o.lng=inSH(lat,lng)?lng:null;
+  if(e.id){Object.assign(items.find(i=>i.id===e.id),o)}else{items.push({id:"r"+Date.now().toString(36),createdAt:Date.now(),city:CITY.name,...o})}
+  const wasEmpty=!chat.log.length||chat.log[0].html.includes("还没有收藏");persist();closePanel();if(wasEmpty)chatGreet();toast(o.lat?"收好啦！":"收好啦！不过缺少位置，不会出现在附近排序里");
+}
+
+/* ---------- settings / backup ---------- */
+function openSettings(){
+  $("panelSlot").innerHTML=`<div class="panel">
+    <h2>设置</h2>
+    <div class="field"><label for="keyIn">高德 Web服务 Key</label><input id="keyIn" value="${esc(amapKey())}" placeholder="粘贴 32 位 Key" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+    <div class="row"><button class="btn primary small" type="button" id="keySave">保存并测试</button><button class="btn small" type="button" id="keyCopy">复制 Key 发给朋友</button></div>
+    <p class="small-note" id="keyMsg" style="margin:0"></p>
+    <hr>
+    <h2>城市</h2>
+    <p class="small-note" style="margin:0">现在是 <b>${esc(CITY.name)}</b>。每个城市的收藏分开显示，切换城市不会删掉任何收藏。</p>
+    <div class="row"><input id="cityIn" placeholder="输入城市名，如 杭州、成都" autocomplete="off"><button class="btn small primary" type="button" id="cityGo">切换</button></div>
+    ${isSH()?"":`<div class="row"><button class="btn small" type="button" id="cityBack">切回上海</button></div>`}
+    <p class="small-note" id="cityMsg" style="margin:0"></p>
+    <hr>
+    <h2>备份</h2>
+    <p class="small-note" style="margin:0">收藏只存在这台手机上。删掉主屏幕图标或清除 Safari 数据会把它们一起删掉，建议隔一段时间导出一次，存到备忘录或微信「文件传输助手」。现在共 ${items.length} 家（所有城市）。</p>
+    <div class="row"><button class="btn small" type="button" id="expShare">导出备份文件</button><button class="btn small" type="button" id="expCopy">复制备份文字</button></div>
+    <div class="field"><label for="impText">恢复：粘贴备份文字，或选择备份文件</label><textarea id="impText" placeholder='[{"name":"…"}]'></textarea></div>
+    <div class="row"><input type="file" id="impFile" accept=".json,application/json,text/plain" style="flex:1;min-width:0;font-size:13px"><button class="btn small primary" type="button" id="impBtn">导入</button></div>
+    <p class="small-note" id="impMsg" style="margin:0"></p>
+    <div class="foot"><button class="btn" type="button" id="setClose">关闭</button></div>
+  </div>`;
+  $("setClose").onclick=closePanel;
+  $("keySave").onclick=async()=>{
+    const k=$("keyIn").value.trim();ls.set(KEY_KEY,k);const m=$("keyMsg");
+    if(!k){m.textContent="已清除 Key";return}
+    m.textContent="测试中…";
+    try{await amap("/v3/config/district",{keywords:"上海",subdistrict:"0"});m.textContent="✓ Key 可以用了";}catch(e){m.textContent=e.message}
+  };
+  $("keyCopy").onclick=async()=>{const k=amapKey();if(!k){$("keyMsg").textContent="还没有保存 Key。";return}
+    try{await navigator.clipboard.writeText(k);toast("Key 已复制，发给朋友粘贴到设置里")}catch{$("keyIn").select();toast("请长按 Key 手动复制")}};
+  const applyCity=c=>{CITY=c;ls.set(CITY_KEY,c);state.here=null;ls.set(HERE_KEY,null);state.district=null;state.cuisine=null;
+    $("hereStatus").textContent="点「定位我」或输入地点，按距离排出你收藏的餐厅。";buildPlaces();closePanel();render();chatGreet();toast("已切换到 "+c.name)};
+  $("cityGo").onclick=async()=>{const n=$("cityIn").value.trim(),m=$("cityMsg");if(!n)return;
+    if(/^上海/.test(n)){applyCity(SHANGHAI);return}
+    m.textContent="正在加载「"+n+"」的区县…";
+    try{const c=await loadCity(n);if(c&&c.districts.length)applyCity(c);else m.textContent="没找到这个城市，检查一下名字。"}
+    catch(e){m.textContent=e.code==="nokey"?"切换到其他城市需要先填好高德 Key。":e.message}};
+  if($("cityBack"))$("cityBack").onclick=()=>applyCity(SHANGHAI);
+  const backup=()=>JSON.stringify(items.map(({_d,...r})=>r));
+  const fname=()=>`王の食庫备份-${new Date().toISOString().slice(0,10)}.json`;
+  $("expShare").onclick=async()=>{
+    const file=new File([backup()],fname(),{type:"application/json"});
+    try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:"王の食庫备份"});return}}catch(e){if(e&&e.name==="AbortError")return}
+    const a=document.createElement("a");a.href=URL.createObjectURL(file);a.download=file.name;document.body.appendChild(a);a.click();a.remove();
+  };
+  $("expCopy").onclick=async()=>{try{await navigator.clipboard.writeText(backup());toast("已复制，粘贴到备忘录保存")}catch{$("impText").value=backup();$("impText").select();toast("请手动长按复制")}};
+  $("impBtn").onclick=async()=>{
+    const m=$("impMsg");let text=$("impText").value.trim();
+    const f=$("impFile").files[0];if(!text&&f)text=await f.text();
+    if(!text){m.textContent="请先粘贴备份文字或选择文件。";return}
+    let arr;try{arr=JSON.parse(text);if(!Array.isArray(arr))throw 0}catch{m.textContent="内容不是有效的备份。";return}
+    const have=new Set(items.map(i=>i.id));let n=0;
+    for(const r of arr){if(!r||typeof r.name!=="string")continue;const id=r.id&&!have.has(r.id)?String(r.id):"r"+Date.now().toString(36)+n;if(r.id&&have.has(r.id))continue;
+      items.push({id,name:r.name,cuisine:String(r.cuisine||"其他"),city:String(r.city||"上海"),district:String(r.district||""),address:String(r.address||""),source:String(r.source||""),note:String(r.note||""),visited:!!r.visited,
+        lat:validLL(r.lat,r.lng)?r.lat:null,lng:validLL(r.lat,r.lng)?r.lng:null,createdAt:Number(r.createdAt)||Date.now()});n++}
+    persist();m.textContent=`导入了 ${n} 家（已存在的会跳过）。`;
+  };
+}
+
+/* ---------- where am I ---------- */
+function setHere(h){state.here=h;ls.set(HERE_KEY,h);state.view="near";render();$("hereStatus").innerHTML=`当前位置：<b>${esc(h.label)}</b>`}
+$("gpsBtn").onclick=()=>{
+  if(!navigator.geolocation){$("hereStatus").textContent="这个浏览器不支持定位，请输入地点。";return}
+  const btn=$("gpsBtn");btn.disabled=true;$("hereStatus").textContent="正在定位…";
+  navigator.geolocation.getCurrentPosition(async pos=>{
+    const g=wgsToGcj(pos.coords.latitude,pos.coords.longitude);let label="我的位置";
+    if(amapKey()){try{const d=await amap("/v3/geocode/regeo",{location:`${g.lng.toFixed(6)},${g.lat.toFixed(6)}`});const ac=d.regeocode.addressComponent||{};
+      label=str(ac.township)&&str(ac.streetNumber&&ac.streetNumber.street)?`${str(ac.township)} ${str(ac.streetNumber.street)}`:(str(d.regeocode.formatted_address).replace(/^.*?(省|自治区)?.*?市/,"")||label)}catch{}}
+    btn.disabled=false;setHere({lat:g.lat,lng:g.lng,label});
+  },err=>{btn.disabled=false;
+    $("hereStatus").textContent=err.code===1?"没有定位权限：到 设置 → 隐私与安全性 → 定位服务 里允许 Safari 网站定位，或直接输入地点。":"定位失败，请到室外再试，或直接输入地点。";
+  },{enableHighAccuracy:true,timeout:15000,maximumAge:60000});
+};
+$("hereForm").onsubmit=async ev=>{
+  ev.preventDefault();const t=$("hereInput").value.trim();if(!t)return;$("hereInput").blur();
+  $("hereBtn").disabled=true;$("hereStatus").textContent="正在查找「"+t+"」…";
+  try{const g=await locateText(t);if(g)setHere(g);else $("hereStatus").textContent="没找到这个地点，换个写法试试。"}
+  catch(e){$("hereStatus").textContent=e.code==="nokey"?"没有高德 Key 只能选下面的地点；在「设置」里填上 Key 就能输入任意地址。":e.message}
+  finally{$("hereBtn").disabled=false}
+};
+function buildPlaces(){const P=PLACES();
+  $("landmarkList").innerHTML=P.map(l=>`<option value="${esc(l[0])}">`).join("");
+  $("quick").innerHTML=P.slice(0,20).map(l=>`<button class="chip" type="button" data-lm="${esc(l[0])}">${esc(l[0])}</button>`).join("");}
+buildPlaces();
+$("quick").onclick=e=>{const b=e.target.closest("[data-lm]");if(!b)return;setHere({...placeMap().get(b.dataset.lm),label:b.dataset.lm})};
+if(state.here)$("hereStatus").innerHTML=`上次的位置：<b>${esc(state.here.label)}</b>`;
+
+/* ---------- 今天吃什么：和她聊天 ---------- */
+const chat={log:[],last:null};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function her(html,q){chat.log.push({who:"her",html,q});}
+function me(text){chat.log.push({who:"me",text});}
+function renderChat(){
+  chat.log=chat.log.slice(-3);
+  $("chatLog").innerHTML=chat.log.map(m=>m.who==="her"
+    ?`<div class="msg her">${pfImg()}${TAIL}<div class="bub">${m.q?'<i class="q">?</i>':""}<span>${m.html}</span></div></div>`
+    :`<div class="msg me"><div class="bub"><span>${esc(m.text)}</span></div></div>`).join("");
+  const r=chat.last;
+  $("chatReplies").innerHTML=!cityItems().length?`<button class="reply go" type="button" data-chat="add"><span>去收藏第一家</span></button>`
+    :r?`<a class="reply go" href="${navURL(r)}" target="_blank" rel="noopener" data-chat="go"><span>就它了！导航</span></a><button class="reply" type="button" data-chat="again"><span>换一家</span></button>`
+    :`<button class="reply go" type="button" data-chat="ask"><span>今天吃什么？</span></button>`;
+}
+function chatGreet(){
+  chat.log=[];chat.last=null;
+  if(!cityItems().length)her(`${esc(CITY.name)}还没有收藏呢～看到好吃的就点「＋ 收藏」告诉我吧！`,true);
+  else her(pick(["肚子饿了吗？让我帮你挑一家！","今天想吃点什么？交给我吧！","在纠结吃什么？我来帮你选！"]),true);
+  renderChat();
+}
+function chatPick(){
+  let pool=cityItems().filter(r=>!state.cuisine||r.cuisine===state.cuisine);
+  if(!pool.length){her("这个菜系下还没有收藏哦，换个菜系试试？");chat.last=null;renderChat();return}
+  const want=pool.filter(r=>!r.visited);if(want.length)pool=want;
+  if(chat.last&&pool.length>1)pool=pool.filter(r=>r.id!==chat.last.id);
+  let near=null;
+  if(state.here){const ds=pool.filter(r=>inSH(r.lat,r.lng)).map(r=>({r,d:km(state.here,r)})).sort((a,b)=>a.d-b.d);
+    const close=ds.filter(x=>x.d<=3);near=close.length?close:ds.slice(0,5);if(near.length)pool=near.map(x=>x.r);}
+  const r=pick(pool);chat.last=r;
+  const d=state.here&&inSH(r.lat,r.lng)?distLabel(km(state.here,r)):null;
+  const bits=[r.cuisine?esc(r.cuisine):"",r.district?esc(r.district):"",d?`离你 <span class="em">${d[0]}</span>，${d[1]}`:""].filter(Boolean).join(" · ");
+  her(`${pick(["就去","去吃","今天就决定是"])}<b>「${esc(r.name)}」</b>${pick(["吧！","！怎么样？","！不会错的～"])}<br>${bits}${r.note?`<br>招牌：${esc(r.note)}`:""}${r.visited?"":`<br><span class="em">还没去过哦！</span>`}${state.here?"":"<br>（告诉我你在哪，我能挑近一点的）"}`);
+  renderChat();
+}
+$("chatReplies").onclick=e=>{const b=e.target.closest("[data-chat]");if(!b)return;const a=b.dataset.chat;
+  if(a==="ask"){me("今天吃什么？");chatPick()}
+  else if(a==="again"){me("换一家！");chatPick()}
+  else if(a==="go"){setTimeout(()=>{me("就它了！");her(pick(["出发！吃得开心～","好耶！记得回来标「去过」哦！","路上小心～"]));chat.last=null;renderChat()},300)}
+  else if(a==="add")openEditor(null);
+};
+
+/* ---------- events ---------- */
+$("addBtn").onclick=()=>openEditor(null);
+$("setBtn").onclick=openSettings;
+$("tabNear").onclick=()=>{state.view="near";render()};
+$("tabDist").onclick=()=>{state.view="district";render()};
+$("onlyWant").onchange=e=>{state.onlyWant=e.target.checked;render()};
+$("cuisineChips").onclick=e=>{const b=e.target.closest("[data-c]");if(!b)return;state.cuisine=b.dataset.c||null;render()};
+$("districtGrid").onclick=e=>{const b=e.target.closest("[data-d]");if(!b)return;state.district=state.district===b.dataset.d?null:b.dataset.d;render()};
+$("results").onclick=e=>{
+  const b=e.target.closest("[data-act]");if(!b)return;const id=b.closest(".card").dataset.id,r=items.find(i=>i.id===id);if(!r)return;
+  const act=b.dataset.act;
+  if(act==="visit"){r.visited=!r.visited;persist()}
+  else if(act==="edit")openEditor(r);
+  else if(act==="del"){state.confirmDel=id;render()}
+  else if(act==="del-no"){state.confirmDel=null;render()}
+  else if(act==="del-yes"){state.confirmDel=null;items=items.filter(i=>i.id!==id);persist();toast("已删除")}
+};
+render();chatGreet();makePortrait();
+if(!amapKey())setTimeout(()=>{if(!items.length)toast("先点「设置」填上高德 Key，搜索和定位会好用很多")},800);
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body>
+</html>
